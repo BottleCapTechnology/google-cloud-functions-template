@@ -42,7 +42,7 @@ gcloud auth activate-service-account --key-file=/tmp/account.json
 gcloud config set project "$PROJECT_ID"
 
 # Execute
-echo "Running script/deploy processDBCommand -e $TARGET"
+echo "Running script/deploy sampleFunction -e $TARGET"
 output=$(sh -c "$GITHUB_WORKSPACE/script/deploy -e $TARGET")
 RESULT=$?
 if [ 0 != "${RESULT}" ]; then
