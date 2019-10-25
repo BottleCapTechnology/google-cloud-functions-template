@@ -10,7 +10,7 @@ cd "$(dirname "$0")/.."
 # -e - The environment to deploy to, either production or staging.
 
 # Google Cloud Storage bucket for deploying functions
-GCLOUD_DEPLOYMENT_BUCKET=gs://function-deploys/
+GCLOUD_DEPLOYMENT_BUCKET=gs://$FUNCTION_BUCKET/
 
 # COMMON FILES
 # These must be in the root level of the repository
