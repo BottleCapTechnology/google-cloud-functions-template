@@ -15,7 +15,6 @@ GCLOUD_DEPLOYMENT_BUCKET=gs://$FUNCTION_BUCKET/
 # COMMON FILES
 # These must be in the root level of the repository
 COMMON_FILES=(
-  'knexfile.js'
   'package.json'
   'package-lock.json'
 )
