@@ -21,7 +21,7 @@ Provided you've set those secrets correctly up above, you can deploy your functi
 curl -u $USER:$PASSWORD \
   -H "Accept: application/vnd.github.ant-man-preview+json" \
   -X POST \
-  https://api.github.com/repos/<owner>/<repo>/deployments \
+  https://api.github.com/repos/$owner/$repo/deployments \
   -d '{"ref": "production"}'
 ```
 
