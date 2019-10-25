@@ -5,5 +5,5 @@
 curl -u gjtorikian:$GITHUB_TOKEN \
   -H "Accept: application/vnd.github.ant-man-preview+json" \
   -X POST \
-  https://api.github.com/repos/BottleCapTechnology/gcp-gloud-functions-template/deployments \
+  https://api.github.com/repos/BottleCapTechnology/google-cloud-functions-template/deployments \
   -d '{"ref": "production"}'
