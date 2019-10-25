@@ -1,0 +1,151 @@
+#!/usr/bin/env bash
+
+# script/deploy: Deploy Google Cloud Functions to production from the current branch
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+# Required input flags:
+# -e - The environment to deploy to, either production or staging.
+
+# Google Cloud Storage bucket for deploying functions
+GCLOUD_DEPLOYMENT_BUCKET=gs://function-deploys/
+
+# COMMON FILES
+# These must be in the root level of the repository
+COMMON_FILES=(
+  'knexfile.js'
+  'package.json'
+  'package-lock.json'
+)
+####################################################################
+####################################################################
+
+while getopts "e:" opt; do
+  case ${opt} in
+    e) ENVIRONMENT=${OPTARG}
+      ;;
+    \? ) echo "I don't understand that command. Check out the README for more details"
+         exit 1
+      ;;
+  esac
+done
+
+FUNC="processDBCommand"
+
+if [ -z "$ENVIRONMENT" ]; then
+  echo "Environment argument missing"
+  exit 3
+fi
+
+if [ "$ENVIRONMENT" != "production" ] && [ "$ENVIRONMENT" != "staging" ]; then
+  echo "Environment '$ENVIRONMENT' not recognized"
+  exit 4
+fi
+
+# Create a new tmp/function-build directory
+if [ -d "tmp/function-build" ]
+  then rm -Rf tmp/function-build
+fi
+mkdir -p tmp/function-build
+
+environment_path(){
+  PATH=$1
+  if [ "$ENVIRONMENT" == "staging" ]; then
+    echo "staging__$PATH"
+  else
+    echo $PATH
+  fi
+}
+
+zippy() {
+  FUNCTION=$1
+  # Bundle each function with common files in the tmp/function-build directory
+  # For each function folder, copy it into the "build" directory
+  echo
+  echo "==> Copying function directories"
+  echo "==> Function = $FUNCTION"
+  SOURCE_PATH=$PWD/$FUNCTION.js
+  echo "==> Source = $SOURCE_PATH"
+
+  DESTINATION_PATH=$PWD/tmp/function-build/$(environment_path $FUNCTION)
+
+  mkdir $DESTINATION_PATH
+  echo "==> Destination = $DESTINATION_PATH"
+  cp -r $SOURCE_PATH $DESTINATION_PATH
+
+  if [ "$ENVIRONMENT" == "staging" ]; then
+    sed -i -e 's/exports\./exports\.staging__/' $PWD/tmp/function-build/staging__$FUNCTION/index.js
+  fi
+
+  # For each common file, put a copy in each function folder
+  echo "==> Copying common files"
+  for COMMON_FILE in "${COMMON_FILES[@]}"
+  do
+    COMMON_SOURCE_PATH=$PWD/$COMMON_FILE
+    cp $COMMON_SOURCE_PATH $DESTINATION_PATH
+  done
+
+  for MIGRATION_FILE in db/migrations/*
+  do
+    MIGRATION_FILE_PATH=$PWD/$MIGRATION_FILE
+    cp $MIGRATION_FILE_PATH $DESTINATION_PATH
+  done
+
+  for BACKFILL_FILE in db/backfills/*
+  do
+    BACKFILL_FILE_PATH=$PWD/$BACKFILL_FILE
+    cp $BACKFILL_FILE_PATH $DESTINATION_PATH
+  done
+
+  # Create .zip archive for each function
+  BASE_DIR=$PWD
+  BUILD_DIR=$PWD/tmp/function-build
+
+  FUNCTION_DIR=$BUILD_DIR/$(environment_path $FUNCTION)
+  FUNCTION_ZIP_ARCHIVE_NAME=$(environment_path $FUNCTION).zip
+
+  cd $FUNCTION_DIR
+  echo "==> Zipping up $FUNCTION_DIR into $FUNCTION_ZIP_ARCHIVE_NAME"
+  zip $FUNCTION_ZIP_ARCHIVE_NAME * -q -D $FUNCTION_DIR
+  cd $BASE_DIR
+}
+
+# Upload .zip archives to Google Cloud Storage
+gcloud_upload() {
+  ZIPFILE=$(environment_path $1)
+  # run the node script that handles the GCloud Storage uploads here
+  echo "==> Uploading $ZIPFILE zip archive to Google Cloud Storage"
+  ZIPPATH=tmp/function-build/$ZIPFILE/$ZIPFILE.zip
+  gsutil cp $ZIPPATH $GCLOUD_DEPLOYMENT_BUCKET
+}
+
+# Deploy using the `gs://` address of the function archives as the source
+
+deployment() {
+  ZIPFILE=$(environment_path $1)
+
+  # Deployment path
+  uri=$GCLOUD_DEPLOYMENT_BUCKET
+  uri+=$ZIPFILE # function
+  uri+=".zip"
+  # Final deploy command
+  echo "==> Deploying $ZIPFILE..."
+  gcloud functions deploy $ZIPFILE \
+    --source $uri \
+    --trigger-http \
+    --region=us-east1 \
+    --no-user-output-enabled \
+    --runtime nodejs10
+}
+
+# Here's where we're calling all the functions
+zippy $FUNC
+gcloud_upload $FUNC
+deployment $FUNC
+
+# Clean up the temporary files
+if [ -d "tmp/function-build" ]
+  then rm -Rf tmp/function-build
+fi

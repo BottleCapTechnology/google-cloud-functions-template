@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# script/server: Launch the application and any extra required processes
+#                locally.
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+echo "==> Starting Google Cloud Functions emulator"
+
+# start functions
+functions start
+
+# make sure the project id is set correctly
+functions config set projectId $PROJECT_ID
+
+functions deploy sampleFunction --trigger-http --local-path=./sampleFunction
+
+functions list
+
+echo "==> Function is ready to go!"

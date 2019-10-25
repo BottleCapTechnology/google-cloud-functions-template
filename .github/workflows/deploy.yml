@@ -1,0 +1,17 @@
+on: [deployment]
+name: Deploys
+jobs:
+  deploy:
+    name: GCF Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out this repo
+        uses: actions/checkout@master
+      - name: Fetches deployment status scripts
+        uses: unacast/actions/github-deploy@9145ff45657852123d8b5394f623b8008b09de3f
+      - name: Run deploy script
+        uses: ./.github/actions/deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}

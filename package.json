@@ -1,0 +1,14 @@
+{
+  "name": "sample-function",
+  "private": true,
+  "version": "0.0.0",
+  "description": "sample-function",
+  "main": "sampleFunction.js",
+  "dependencies": {
+    "compression": "^1.7.4",
+    "express": "^4.17.1"
+  },
+  "scripts": {},
+  "author": "Garen J. Torikian",
+  "license": "MIT"
+}

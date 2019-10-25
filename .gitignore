@@ -1,0 +1,8 @@
+.DS_Store
+**/.env
+**/*.pem
+**/.sample-input-values
+**/node_modules/
+.vscode/
+tmp/*
+build/
