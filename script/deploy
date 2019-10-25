@@ -86,18 +86,6 @@ zippy() {
     cp $COMMON_SOURCE_PATH $DESTINATION_PATH
   done
 
-  for MIGRATION_FILE in db/migrations/*
-  do
-    MIGRATION_FILE_PATH=$PWD/$MIGRATION_FILE
-    cp $MIGRATION_FILE_PATH $DESTINATION_PATH
-  done
-
-  for BACKFILL_FILE in db/backfills/*
-  do
-    BACKFILL_FILE_PATH=$PWD/$BACKFILL_FILE
-    cp $BACKFILL_FILE_PATH $DESTINATION_PATH
-  done
-
   # Create .zip archive for each function
   BASE_DIR=$PWD
   BUILD_DIR=$PWD/tmp/function-build
