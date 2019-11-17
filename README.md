@@ -15,7 +15,7 @@ All of the following are required as [Secrets](https://developer.github.com/acti
    * For information about service account keys please see the [Google Cloud docs](https://cloud.google.com/sdk/docs/authorizing)
 * `FUNCTION_BUCKET`: This is the [name of your Google Cloud Storage bucket](https://cloud.google.com/functions/docs/deploying/) which contains your funcion's code.
 
-For more information about using Secrets in GitHub Actions please see the [Actions docs](https://developer.github.com/actions/creating-workflows/storing-secrets/)
+For more information about using Secrets in GitHub Actions, please see the [Actions docs](https://developer.github.com/actions/creating-workflows/storing-secrets/).
 
 ## Deploying
 
