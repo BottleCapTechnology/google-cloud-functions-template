@@ -6,6 +6,8 @@ This is a template repository designed to make it super easy to deploy Node.js c
 
 After cloning this repo, all you really need to do is replace the words `sampleFunction` and `sample-function` with the name of your function, and define your function code in `sampleFunction.js`. The repo is totally ready to be deployed using the `gcloud` utility, provided you have configured the necessary environment variables.
 
+More information can be found in [the script folder](script/README.md).
+
 ## Secrets / Environment variables
 
 All of the following are required as [Secrets](https://developer.github.com/actions/creating-workflows/storing-secrets/) stored in your repository, or as environment variables if you're deploying locally.
