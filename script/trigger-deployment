@@ -1,8 +1,8 @@
 #!/bin/sh
 #
-# Triggers the GitHub Actions workflow for deployments
+# Demonstration of how to trigger the GitHub Actions workflow for deployments
 
-curl -u gjtorikian:$GITHUB_TOKEN \
+curl -u SkaLover95:$GITHUB_TOKEN \
   -H "Accept: application/vnd.github.ant-man-preview+json" \
   -X POST \
   https://api.github.com/repos/BottleCapTechnology/google-cloud-functions-template/deployments \
